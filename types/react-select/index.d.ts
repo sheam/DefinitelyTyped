@@ -1,12 +1,13 @@
 // Type definitions for react-select 1.0
 // Project: https://github.com/JedWatson/react-select
-// Definitions by: ESQUIBET Hugo <https://github.com/Hesquibet/>
-//                 Gilad Gray <https://github.com/giladgray/>
-//                 Izaak Baker <https://github.com/iebaker/>
-//                 Tadas Dailyda <https://github.com/skirsdeda/>
-//                 Mark Vujevits <https://github.com/vujevits/>
-//                 Mike Deverell <https://github.com/devrelm/>
+// Definitions by: ESQUIBET Hugo <https://github.com/Hesquibet>
+//                 Gilad Gray <https://github.com/giladgray>
+//                 Izaak Baker <https://github.com/iebaker>
+//                 Tadas Dailyda <https://github.com/skirsdeda>
+//                 Mark Vujevits <https://github.com/vujevits>
+//                 Mike Deverell <https://github.com/devrelm>
 //                 MartynasZilinskas <https://github.com/MartynasZilinskas>
+//                 Onat Yigit Mercan <https://github.com/onatm>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.3
 
@@ -20,23 +21,25 @@ declare namespace ReactSelectClass {
     class Async extends React.Component<ReactAsyncSelectProps, ReactSelectClass.AsyncState> { }
     class AsyncCreatable extends React.Component<ReactAsyncSelectProps & ReactCreatableSelectProps, ReactSelectClass.AsyncState> { }
 
+    type HandlerRendererResult = JSX.Element | null | false;
+
     // Handlers
     type FocusOptionHandler = (option: Option) => void;
     type SelectValueHandler = (option: Option) => void;
-    type ArrowRendererHandler = (props: ArrowRendererProps) => JSX.Element;
+    type ArrowRendererHandler = (props: ArrowRendererProps) => HandlerRendererResult;
     type FilterOptionHandler = (option: Option, filter: string) => Option;
     type FilterOptionsHandler = (options: Options, filter: string, currentValues: Options) => Options;
-    type InputRendererHandler = (props: { [key: string]: any }) => JSX.Element;
-    type MenuRendererHandler = (props: MenuRendererProps) => JSX.Element;
+    type InputRendererHandler = (props: { [key: string]: any }) => HandlerRendererResult;
+    type MenuRendererHandler = (props: MenuRendererProps) => HandlerRendererResult;
     type OnCloseHandler = () => void;
     type OnInputChangeHandler = (inputValue: string) => void;
-    type OnInputKeyDownHandler = React.KeyboardEventHandler<HTMLDivElement>;
+    type OnInputKeyDownHandler = React.KeyboardEventHandler<HTMLDivElement | HTMLInputElement>;
     type OnMenuScrollToBottomHandler = () => void;
     type OnOpenHandler = () => void;
-    type OnFocusHandler = React.FocusEventHandler<HTMLDivElement>;
-    type OnBlurHandler = React.FocusEventHandler<HTMLDivElement>;
-    type OptionRendererHandler = (option: Option) => JSX.Element;
-    type ValueRendererHandler = (option: Option) => JSX.Element;
+    type OnFocusHandler = React.FocusEventHandler<HTMLDivElement | HTMLInputElement>;
+    type OnBlurHandler = React.FocusEventHandler<HTMLDivElement | HTMLInputElement>;
+    type OptionRendererHandler = (option: Option) => HandlerRendererResult;
+    type ValueRendererHandler = (option: Option) => HandlerRendererResult;
     type OnValueClickHandler = (value: string, event: React.MouseEvent<HTMLAnchorElement>) => void;
     type IsOptionUniqueHandler = (arg: { option: Option, options: Options, labelKey: string, valueKey: string }) => boolean;
     type IsValidNewOptionHandler = (arg: { label: string }) => boolean;
@@ -47,6 +50,7 @@ declare namespace ReactSelectClass {
     type OnChangeSingleHandler<TValue = OptionValues> = OnChangeHandler<Option<TValue>>;
     type OnChangeMultipleHandler<TValue = OptionValues> = OnChangeHandler<Options<TValue>>;
     type OnChangeHandler<TOption = Option | Options> = (newValue: TOption | null) => void;
+    type OnNewOptionClickHandler = (option: Option) => void;
 
     type LoadOptionsHandler = LoadOptionsAsyncHandler | LoadOptionsLegacyHandler;
     type LoadOptionsAsyncHandler = (input: string) => Promise<AutocompleteResult>;
@@ -93,6 +97,11 @@ declare namespace ReactSelectClass {
          * @default false
          */
         disabled?: boolean;
+        /**
+         * In the event that a custom menuRenderer is provided, Option should be able
+         * to accept arbitrary key-value pairs. See react-virtualized-select.
+         */
+        [property: string]: any;
     }
 
     type OptionValues = string | number | boolean;
@@ -295,7 +304,7 @@ declare namespace ReactSelectClass {
          * placeholder displayed when there are no matching search results or a falsy value to hide it
          * @default "No results found"
          */
-        noResultsText?: string;
+        noResultsText?: string | JSX.Element;
         /**
          * onBlur handler: function (event) {}
          */
@@ -459,6 +468,11 @@ declare namespace ReactSelectClass {
          * Decides if a keyDown event (eg its 'keyCode') should result in the creation of a new option.
          */
         shouldKeyDownEventCreateNewOption?: ShouldKeyDownEventCreateNewOptionHandler;
+
+        /**
+         * new option click handler: function (option) {}
+         */
+        onNewOptionClick?: OnNewOptionClickHandler;
     }
 
     interface ReactAsyncSelectProps extends ReactSelectProps {
@@ -505,7 +519,7 @@ declare namespace ReactSelectClass {
         /**
          *  placeholder displayed when there are no matching search results (shared with Select)
          */
-        noResultsText?: string;
+        noResultsText?: string | JSX.Element;
         /**
          *  field placeholder; displayed when there's no value (shared with Select)
          */
